@@ -214,7 +214,7 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 	}
 
 	// Auto Drive Stupid Simple
-//	GetVehicleMovementComponent()->bUseRVOAvoidance = true;
+	GetVehicleMovementComponent()->bUseRVOAvoidance = true;
 //	GetVehicleMovementComponent()->SetThrottleInput(1.0f);
 
 }
