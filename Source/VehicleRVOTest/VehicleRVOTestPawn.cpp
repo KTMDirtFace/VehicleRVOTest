@@ -214,11 +214,10 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 		}
 	}
 
-	// Auto Drive Stupid Simple
-	GetVehicleMovementComponent()->RVOAvoidanceRadius = 2000;
+	// Auto Drive and Avoidance
 	if (bEnableAutoDrive)
 	{
-		GetVehicleMovementComponent()->bUseRVOAvoidance = true;
+	//	GetVehicleMovementComponent()->bUseRVOAvoidance = true;
 		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
 	}
 }
