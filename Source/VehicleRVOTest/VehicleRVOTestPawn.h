@@ -36,9 +36,11 @@ class AVehicleRVOTestPawn : public AWheeledVehicle
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UTextRenderComponent* InCarGear;
 
-	
 public:
 	AVehicleRVOTestPawn();
+
+	UPROPERTY(Category = Avoidance, EditAnywhere, BlueprintReadWrite)
+	bool bEnableAutoDrive;
 
 	/** The current speed as a string eg 10 km/h */
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly)

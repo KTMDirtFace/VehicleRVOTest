@@ -112,6 +112,7 @@ AVehicleRVOTestPawn::AVehicleRVOTestPawn()
 	GearDisplayColor = FColor(255, 255, 255, 255);
 
 	bInReverseGear = false;
+	bEnableAutoDrive = false;
 }
 
 void AVehicleRVOTestPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -214,9 +215,12 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 	}
 
 	// Auto Drive Stupid Simple
-	GetVehicleMovementComponent()->bUseRVOAvoidance = true;
-	GetVehicleMovementComponent()->SetThrottleInput(1.0f);
-
+	GetVehicleMovementComponent()->RVOAvoidanceRadius = 2000;
+	if (bEnableAutoDrive)
+	{
+		GetVehicleMovementComponent()->bUseRVOAvoidance = true;
+		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
+	}
 }
 
 void AVehicleRVOTestPawn::BeginPlay()
