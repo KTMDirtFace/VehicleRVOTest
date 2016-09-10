@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{47C32236-4042-8142-59ED-0B8D90D2CFC0}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "VehicleRVOTest",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
