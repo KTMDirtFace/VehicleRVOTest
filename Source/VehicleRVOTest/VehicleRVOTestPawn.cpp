@@ -112,7 +112,9 @@ AVehicleRVOTestPawn::AVehicleRVOTestPawn()
 	GearDisplayColor = FColor(255, 255, 255, 255);
 
 	bInReverseGear = false;
+
 	bEnableAutoDrive = false;
+	SteeringTarget = nullptr;
 }
 
 void AVehicleRVOTestPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -136,12 +138,14 @@ void AVehicleRVOTestPawn::SetupPlayerInputComponent(class UInputComponent* Input
 
 void AVehicleRVOTestPawn::MoveForward(float Val)
 {
-	GetVehicleMovementComponent()->SetThrottleInput(Val);
+	if ( !bEnableAutoDrive )
+		GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
 void AVehicleRVOTestPawn::MoveRight(float Val)
 {
-	GetVehicleMovementComponent()->SetSteeringInput(Val);
+	if ( !bEnableAutoDrive || (FMath::Abs(Val) > 0 ))
+		GetVehicleMovementComponent()->SetSteeringInput(Val);
 }
 
 void AVehicleRVOTestPawn::OnHandbrakePressed()
@@ -217,7 +221,14 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 	// Auto Drive and Avoidance
 	if (bEnableAutoDrive)
 	{
-	//	GetVehicleMovementComponent()->bUseRVOAvoidance = true;
+		float SteeringValue = 0.0f;
+		if (SteeringTarget != nullptr)
+		{
+
+			GetVehicleMovementComponent()->SetSteeringInput(SteeringValue);
+		}
+
+		GetVehicleMovementComponent()->SetSteeringInput(1.0f);
 		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
 	}
 }

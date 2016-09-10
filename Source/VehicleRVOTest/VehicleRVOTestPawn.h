@@ -42,6 +42,9 @@ public:
 	UPROPERTY(Category = Avoidance, EditAnywhere, BlueprintReadWrite)
 	bool bEnableAutoDrive;
 
+	UPROPERTY(Category = Avoidance, EditAnywhere, BlueprintReadWrite)
+	AActor *SteeringTarget;
+
 	/** The current speed as a string eg 10 km/h */
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly)
 	FText SpeedDisplayString;
