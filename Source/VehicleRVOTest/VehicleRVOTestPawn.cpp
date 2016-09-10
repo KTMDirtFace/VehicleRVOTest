@@ -12,6 +12,7 @@
 #include "Vehicles/WheeledVehicleMovementComponent4W.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine.h"
+#include "AI/Navigation/AvoidanceManager.h"
 
 // Needed for VR Headset
 #if HMD_MODULE_INCLUDED
@@ -221,10 +222,12 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 	// Auto Drive and Avoidance
 	if (bEnableAutoDrive)
 	{
+		UAvoidanceManager* AvoidanceManager = GetWorld()->GetAvoidanceManager();
+		AvoidanceManager->AvoidanceDebugForAll(true);
+
 		float SteeringValue = 0.0f;
 		if (SteeringTarget != nullptr)
 		{
-
 			GetVehicleMovementComponent()->SetSteeringInput(SteeringValue);
 		}
 
