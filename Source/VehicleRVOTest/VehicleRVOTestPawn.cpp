@@ -19,6 +19,8 @@
 #include "IHeadMountedDisplay.h"
 #endif // HMD_MODULE_INCLUDED
 
+PRAGMA_DISABLE_OPTIMIZATION
+
 const FName AVehicleRVOTestPawn::LookUpBinding("LookUp");
 const FName AVehicleRVOTestPawn::LookRightBinding("LookRight");
 
@@ -222,14 +224,31 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 	// Auto Drive and Avoidance
 	if (bEnableAutoDrive)
 	{
-
 		UAvoidanceManager* AvoidanceManager = GetWorld()->GetAvoidanceManager();
 		AvoidanceManager->AvoidanceDebugForAll(true);
 
 		float SteeringValue = 0.0f;
 		if (SteeringTarget != nullptr)
 		{
+			FVector VehicleDirection = GetActorRotation().Vector();
+			FVector VehicleLocation = GetActorLocation();
+			FVector SteeringTargetLocation = SteeringTarget->GetActorLocation();
+			FVector SteeringDirection = (SteeringTargetLocation - VehicleLocation).GetSafeNormal();
+			float angleDiff = FMath::RadiansToDegrees(SteeringDirection.HeadingAngle() - VehicleDirection.HeadingAngle());
+
+			// Lerp from 0-90 to 0-0.5;
+			const float maxSteeringAmount = 1.0f;// 0.5f;
+			const float maxAngleAmouont = 20.0f;// 90.0f;
+			SteeringValue = FMath::Clamp((maxSteeringAmount / maxAngleAmouont)*angleDiff, -maxSteeringAmount, maxSteeringAmount);
+				
+
 			GetVehicleMovementComponent()->SetSteeringInput(SteeringValue);
+
+			FVector debugStringLoc = VehicleLocation;
+			debugStringLoc.Z += 250;
+			FString debugSteering = FString::Printf(TEXT("SteeringVal: %f"), SteeringValue);
+			DrawDebugString(GWorld, debugStringLoc, debugSteering, NULL, FColor::White, 0);
+			DrawDebugSphere(GWorld, SteeringTargetLocation, 100, 10, FColor::Red);
 		}
 
 //		GetVehicleMovementComponent()->SetSteeringInput(1.0f);
