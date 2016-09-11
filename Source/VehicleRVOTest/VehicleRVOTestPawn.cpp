@@ -141,7 +141,7 @@ void AVehicleRVOTestPawn::SetupPlayerInputComponent(class UInputComponent* Input
 
 void AVehicleRVOTestPawn::MoveForward(float Val)
 {
-	if ( !bEnableAutoDrive )
+//	if ( !bEnableAutoDrive )
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
@@ -226,6 +226,7 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 	{
 		UAvoidanceManager* AvoidanceManager = GetWorld()->GetAvoidanceManager();
 		AvoidanceManager->AvoidanceDebugForAll(true);
+		AvoidanceManager->LockTimeAfterClean = 0.001; // default of 0.01 causes problems because my framerate is so fast my vectors are always behind.
 
 		float SteeringValue = 0.0f;
 		if (SteeringTarget != nullptr)
@@ -235,10 +236,11 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 			FVector SteeringTargetLocation = SteeringTarget->GetActorLocation();
 			FVector SteeringDirection = (SteeringTargetLocation - VehicleLocation).GetSafeNormal();
 			float angleDiff = FMath::RadiansToDegrees(SteeringDirection.HeadingAngle() - VehicleDirection.HeadingAngle());
+			angleDiff = FMath::UnwindDegrees(angleDiff);
 
 			// Lerp from 0-90 to 0-0.5;
 			const float maxSteeringAmount = 1.0f;// 0.5f;
-			const float maxAngleAmouont = 20.0f;// 90.0f;
+			const float maxAngleAmouont = 10.0f;// 90.0f;
 			SteeringValue = FMath::Clamp((maxSteeringAmount / maxAngleAmouont)*angleDiff, -maxSteeringAmount, maxSteeringAmount);
 				
 
@@ -246,13 +248,13 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 
 			FVector debugStringLoc = VehicleLocation;
 			debugStringLoc.Z += 250;
-			FString debugSteering = FString::Printf(TEXT("SteeringVal: %f"), SteeringValue);
+			FString debugSteering = FString::Printf(TEXT("AngleDiff: %f SteeringVal: %f"), angleDiff, SteeringValue);
 			DrawDebugString(GWorld, debugStringLoc, debugSteering, NULL, FColor::White, 0);
 			DrawDebugSphere(GWorld, SteeringTargetLocation, 100, 10, FColor::Red);
 		}
 
 //		GetVehicleMovementComponent()->SetSteeringInput(1.0f);
-		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
+//		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
 	}
 }
 
