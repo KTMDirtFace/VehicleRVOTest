@@ -13,6 +13,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "Engine.h"
 #include "AI/Navigation/AvoidanceManager.h"
+#include "SplinePath.h"
 
 // Needed for VR Headset
 #if HMD_MODULE_INCLUDED
@@ -117,7 +118,8 @@ AVehicleRVOTestPawn::AVehicleRVOTestPawn()
 	bInReverseGear = false;
 
 	bEnableAutoDrive = false;
-	SteeringTarget = nullptr;
+	SteeringTarget = FVector::ZeroVector;
+	SplinePath = nullptr;
 }
 
 void AVehicleRVOTestPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -229,11 +231,39 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 		AvoidanceManager->LockTimeAfterClean = 0.001; // default of 0.01 causes problems because my framerate is so fast my vectors are always behind.
 
 		float SteeringValue = 0.0f;
-		if (SteeringTarget != nullptr)
+
+		if (SplinePath != nullptr)
+		{
+			USplineComponent *SplineComponent = SplinePath->SplineComponent;
+			if (SplineComponent != nullptr)
+			{
+				float LookAheadDistance = 1000.0f;
+
+				FVector VehicleLocation = GetActorLocation();
+				FVector ClosestLocationOnSpline = SplineComponent->FindLocationClosestToWorldLocation(VehicleLocation, ESplineCoordinateSpace::Type::World);
+				
+				float inputKeyClosest = SplineComponent->FindInputKeyClosestToWorldLocation(ClosestLocationOnSpline);
+				FVector ClosestToInputKey = SplineComponent->GetLocationAtSplineInputKey(inputKeyClosest, ESplineCoordinateSpace::Type::World);
+			
+				int32 ClosestPointIndex = SplinePath->GetClosestPointIndexGivenWorldLocation(VehicleLocation);
+				if (ClosestPointIndex != INDEX_NONE)
+				{
+					FVector LocationAtClosePoint = SplineComponent->GetLocationAtSplinePoint(ClosestPointIndex, ESplineCoordinateSpace::Type::World);
+					DrawDebugSphere(GWorld, LocationAtClosePoint, 100, 10, FColor::Green);
+
+					
+				}
+
+				DrawDebugSphere(GWorld, ClosestLocationOnSpline, 100, 10, FColor::Yellow);
+				DrawDebugSphere(GWorld, ClosestToInputKey, 200, 10, FColor::Blue);
+			}
+		}
+
+		if (SteeringTarget != FVector::ZeroVector)
 		{
 			FVector VehicleDirection = GetActorRotation().Vector();
 			FVector VehicleLocation = GetActorLocation();
-			FVector SteeringTargetLocation = SteeringTarget->GetActorLocation();
+			FVector SteeringTargetLocation = SteeringTarget;// SteeringTarget->GetActorLocation();
 			FVector SteeringDirection = (SteeringTargetLocation - VehicleLocation).GetSafeNormal();
 			float angleDiff = FMath::RadiansToDegrees(SteeringDirection.HeadingAngle() - VehicleDirection.HeadingAngle());
 			angleDiff = FMath::UnwindDegrees(angleDiff);
@@ -242,7 +272,7 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 			const float maxSteeringAmount = 1.0f;// 0.5f;
 			const float maxAngleAmouont = 10.0f;// 90.0f;
 			SteeringValue = FMath::Clamp((maxSteeringAmount / maxAngleAmouont)*angleDiff, -maxSteeringAmount, maxSteeringAmount);
-				
+
 
 			GetVehicleMovementComponent()->SetSteeringInput(SteeringValue);
 
@@ -254,7 +284,7 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 		}
 
 //		GetVehicleMovementComponent()->SetSteeringInput(1.0f);
-//		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
+///		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
 	}
 }
 
