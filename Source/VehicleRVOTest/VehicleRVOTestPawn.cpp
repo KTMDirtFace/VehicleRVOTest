@@ -222,6 +222,7 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 	// Auto Drive and Avoidance
 	if (bEnableAutoDrive)
 	{
+
 		UAvoidanceManager* AvoidanceManager = GetWorld()->GetAvoidanceManager();
 		AvoidanceManager->AvoidanceDebugForAll(true);
 
@@ -231,7 +232,7 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 			GetVehicleMovementComponent()->SetSteeringInput(SteeringValue);
 		}
 
-		GetVehicleMovementComponent()->SetSteeringInput(1.0f);
+//		GetVehicleMovementComponent()->SetSteeringInput(1.0f);
 		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
 	}
 }
