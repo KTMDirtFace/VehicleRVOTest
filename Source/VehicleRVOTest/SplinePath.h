@@ -26,7 +26,8 @@ public:
 	class USplineComponent *SplineComponent;
 	
 
-	int32 GetClosestPointIndexGivenWorldLocation(const FVector &WorldLocation);
+	int32 GetClosestSegmentIndex(const FVector &WorldLocation);
+	FVector GetLocationAlongSplineFromWorldLocation(const FVector &StartWorldLocation, float distFrom, ESplineCoordinateSpace::Type CoordinateSpace);
 private:
 	
 };

@@ -143,7 +143,7 @@ void AVehicleRVOTestPawn::SetupPlayerInputComponent(class UInputComponent* Input
 
 void AVehicleRVOTestPawn::MoveForward(float Val)
 {
-//	if ( !bEnableAutoDrive )
+	if ( !bEnableAutoDrive )
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
@@ -241,21 +241,11 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 
 				FVector VehicleLocation = GetActorLocation();
 				FVector ClosestLocationOnSpline = SplineComponent->FindLocationClosestToWorldLocation(VehicleLocation, ESplineCoordinateSpace::Type::World);
-				
-				float inputKeyClosest = SplineComponent->FindInputKeyClosestToWorldLocation(ClosestLocationOnSpline);
-				FVector ClosestToInputKey = SplineComponent->GetLocationAtSplineInputKey(inputKeyClosest, ESplineCoordinateSpace::Type::World);
-			
-				int32 ClosestPointIndex = SplinePath->GetClosestPointIndexGivenWorldLocation(VehicleLocation);
-				if (ClosestPointIndex != INDEX_NONE)
-				{
-					FVector LocationAtClosePoint = SplineComponent->GetLocationAtSplinePoint(ClosestPointIndex, ESplineCoordinateSpace::Type::World);
-					DrawDebugSphere(GWorld, LocationAtClosePoint, 100, 10, FColor::Green);
 
-					
-				}
+				SteeringTarget = SplinePath->GetLocationAlongSplineFromWorldLocation(VehicleLocation, LookAheadDistance, ESplineCoordinateSpace::Type::World);
 
 				DrawDebugSphere(GWorld, ClosestLocationOnSpline, 100, 10, FColor::Yellow);
-				DrawDebugSphere(GWorld, ClosestToInputKey, 200, 10, FColor::Blue);
+				DrawDebugSphere(GWorld, SteeringTarget, 100, 10, FColor::Red);
 			}
 		}
 
@@ -283,8 +273,7 @@ void AVehicleRVOTestPawn::Tick(float Delta)
 			DrawDebugSphere(GWorld, SteeringTargetLocation, 100, 10, FColor::Red);
 		}
 
-//		GetVehicleMovementComponent()->SetSteeringInput(1.0f);
-///		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
+		GetVehicleMovementComponent()->SetThrottleInput(0.8f);
 	}
 }
 
